@@ -120,7 +120,7 @@ if __name__ == '__main__':
                 break
 
             log("Getting cluster credentials")
-            get_creds = az(['aks', 'get-credentials', '--resource-group', 'dolos', '--name', 'dolos'])
+            get_creds = az(['aks', 'get-credentials', '--resource-group', 'dolos', '--name', 'dolos', '--overwrite-existing'])
             if not status(get_creds):
                 break
 
