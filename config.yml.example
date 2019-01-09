@@ -4,5 +4,13 @@ aks:
   user:
   password:
   tenant:
+  node_type:
+  node_number: 1
+  kubernetes_version:
+  location: eastus
 gke:
   project:
+  node_type:
+  node_number:
+  kubernetes_version:
+  region: us-east1-b

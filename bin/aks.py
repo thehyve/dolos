@@ -24,6 +24,17 @@ LOGIN = [
     '--tenant', config['aks']['tenant']
 ]
 
+aks_parameters = {
+    'node_type' : '--node-vm-size',
+    'node_number' : '--node-count',
+    'kubernetes_version' : '--kubernetes-version',
+    'location' : '--location',
+}
+
+group_parameters = {
+    'location' : '--location',
+}
+
 def requests_retry_session(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
     session = session or requests.Session()
     retry = Retry(
@@ -79,6 +90,12 @@ def cleanup():
     except:
         pass
 
+def add_parameters_if_provided (input,parameters):
+    for configparameter in parameters:
+        if configparameter in config['aks'] and config['aks'][configparameter]:
+            input.extend ( [ parameters[configparameter], str(config['aks'][configparameter]) ] )
+    return input
+
 if __name__ == '__main__':
 
     try:
@@ -92,12 +109,13 @@ if __name__ == '__main__':
             log("Starting test")
 
             log("Creating Resource Group")
-            group_create = az(['group', 'create', '--name', 'dolos', '--location', 'eastus'])
+            group_create = az(add_parameters_if_provided(['group', 'create', '--name', 'dolos'], group_parameters))
             if not status(group_create):
                 break
 
             log("Creating the AKS cluster")
-            aks_create = az(['aks', 'create', '--service-principal', config['aks']['user'], '--client-secret', config['aks']['password'], '--resource-group', 'dolos', '--name', 'dolos', '--node-count', '1', '--generate-ssh-keys'])
+            aks_create_base_command = ['aks', 'create', '--service-principal', config['aks']['user'], '--client-secret', config['aks']['password'], '--resource-group', 'dolos', '--name', 'dolos', '--generate-ssh-keys']
+            aks_create = az(add_parameters_if_provided(aks_create_base_command,aks_parameters))
             if not status(aks_create):
                 break
 

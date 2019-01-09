@@ -13,14 +13,22 @@ import logging
 DIR_NAME = os.path.dirname(os.path.realpath(__file__))
 DIR_PARENT = os.path.abspath(os.path.join(DIR_NAME, os.pardir))
 
+gke_parameters = {
+    'node_type' : '--machine-type',
+    'node_number' : '--num-nodes',
+    'kubernetes_version' : '--cluster-version',
+    'region' : '--region',
+}
+
 with open(os.path.join(DIR_PARENT, 'config.yml'), 'r') as config_file:
     config = yaml.load(config_file.read())
 
 key_file = os.path.join(DIR_PARENT, 'service-account.json')
 subprocess.check_output(['gcloud', 'auth', 'activate-service-account', '--key-file=' + key_file])
 
-subprocess.check_output(['gcloud', 'config', 'set', 'project', config['gke']['project']])
-subprocess.check_output(['gcloud', 'config', 'set', 'compute/zone', 'us-east1-b'])
+if 'region' in config['gke'] and config['gke']['region']:
+    subprocess.check_output(['gcloud', 'config', 'set', 'compute/zone', config['gke']['region']] )
+subprocess.check_output(['gcloud', 'config', 'set', 'project', str(config['gke']['project'])])
 
 
 def requests_retry_session(retries=3, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
@@ -72,6 +80,12 @@ def cleanup():
     except:
         pass
 
+def add_parameters_if_provided (input,parameters):
+    for configparameter in parameters:
+        if configparameter in config['gke'] and config['gke'][configparameter]:
+            input.extend ( [ parameters[configparameter], str(config['gke'][configparameter]) ] )
+    return input
+
 if __name__ == '__main__':
 
     try:
@@ -85,7 +99,8 @@ if __name__ == '__main__':
             log("Starting test")
 
             log("Creating the GKE cluster")
-            gke_create = subprocess.check_output(['gcloud', 'container', 'clusters', 'create', 'dolos'])
+            gke_create_base_command = ['gcloud', 'container', 'clusters', 'create', 'dolos']
+            gke_create = subprocess.check_output(add_parameters_if_provided(gke_create_base_command,gke_parameters))
 
 
             log("Getting cluster credentials")
