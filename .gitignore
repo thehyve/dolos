@@ -1,3 +1,4 @@
 log/*
-config.yml
 service-account.json
+*.pyc
+config.yml
