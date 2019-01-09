@@ -48,7 +48,12 @@ Take the `appId`, `password` and `tenant` from the previous commands and try to 
 az login --service-principal --username <APP_ID> --password <PASSWORD> --tenant <TENANT_ID>
 ```
 
-Now put the `appId`, `password` and `tenant` into the `config.yml.example` and rename the file to `config.yml`.
+Now put the `appId`, `password` and `tenant` into the `config.yml.example` and rename the file to `config.yml`. The
+config file has some optional parameters for Azure:
+- `node_type`: the VM type of the cluster nodes
+- `node_number`: the number of nodes in the cluster
+- `kubernetes_version`: use the Azure CLI to get a list of available Kubernetes versions. For example: `az aks get-versions --location westeurope`
+- `location`: use `az account list-locations` to get a list of location names, and consult the [AKS region availability page](https://docs.microsoft.com/en-us/azure/aks/container-service-quotas) for a list of available regions.
 
 ## Google
 
@@ -99,6 +104,14 @@ gcloud services enable container.googleapis.com
 ```
 
 Finally, take the value for `project_id` in the `service-account.json` and put it in `config.yml` under the gke section.
+
+The config file has some optional parameters for GKE:
+- `node_type`: the VM type of the cluster nodes
+- `node_number`: the number of nodes in the cluster
+- `kubernetes_version`: the Kubernetes version on the nodes. Use gcloud to get a list of available versions. For example:
+  `gcloud container get-server-config --zone us-central1-a`
+- `region`: Use gcloud to get a list available regions. For example: `gcloud compute zones list`
+
 
 ## Amazon
 
