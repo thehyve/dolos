@@ -113,9 +113,13 @@ if __name__ == '__main__':
             if not status(group_create):
                 break
 
-            log("Creating the AKS cluster")
-            aks_create_base_command = ['aks', 'create', '--service-principal', config['aks']['user'], '--client-secret', config['aks']['password'], '--resource-group', 'dolos', '--name', 'dolos', '--generate-ssh-keys']
-            aks_create = az(add_parameters_if_provided(aks_create_base_command,aks_parameters))
+            try:
+                log("Creating the AKS cluster")
+                aks_create_base_command = ['aks', 'create', '--service-principal', config['aks']['user'], '--client-secret', config['aks']['password'], '--resource-group', 'dolos', '--name', 'dolos', '--generate-ssh-keys']
+                aks_create = az(add_parameters_if_provided(aks_create_base_command,aks_parameters))
+            except:
+                log("Creating AKS cluster failed.")
+                continue
             if not status(aks_create):
                 break
 

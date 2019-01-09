@@ -98,9 +98,13 @@ if __name__ == '__main__':
             create_start_time = datetime.datetime.now()
             log("Starting test")
 
-            log("Creating the GKE cluster")
-            gke_create_base_command = ['gcloud', 'container', 'clusters', 'create', 'dolos']
-            gke_create = subprocess.check_output(add_parameters_if_provided(gke_create_base_command,gke_parameters))
+            try:
+                log("Creating the GKE cluster")
+                gke_create_base_command = ['gcloud', 'container', 'clusters', 'create', 'dolos']
+                gke_create = subprocess.check_output(add_parameters_if_provided(gke_create_base_command,gke_parameters))
+            except:
+                log("Creating GKE cluster failed.")
+                continue
 
 
             log("Getting cluster credentials")
